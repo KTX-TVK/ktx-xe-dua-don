@@ -1,4 +1,5 @@
 // api.js - Giao tiếp với Google Apps Script
+// Dùng GET request để tránh CORS preflight
 
 const API = {
   async call(data) {
@@ -8,13 +9,26 @@ const API = {
       return;
     }
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(data)
-      });
-      const json = await res.json();
-      return json;
+      // Dùng GET + query string để tránh CORS
+      const params = new URLSearchParams();
+      for (const key in data) {
+        if (data[key] !== undefined && data[key] !== null) {
+          if (typeof data[key] === 'object') {
+            params.append(key, JSON.stringify(data[key]));
+          } else {
+            params.append(key, data[key]);
+          }
+        }
+      }
+      const fullUrl = url + '?' + params.toString();
+      const res = await fetch(fullUrl, { method: 'GET', redirect: 'follow' });
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch(e) {
+        console.error('Parse error:', text.substring(0, 200));
+        return { error: 'Lỗi phản hồi server' };
+      }
     } catch (e) {
       console.error('API Error:', e);
       return { error: 'Lỗi kết nối: ' + e.message };
@@ -35,7 +49,7 @@ const API = {
   createHocSinh: (data) => API.call({ action: 'createHocSinh', ...data }),
   updateHocSinh: (data) => API.call({ action: 'updateHocSinh', ...data }),
   deleteHocSinh: (id) => API.call({ action: 'deleteHocSinh', id }),
-  importHocSinh: (rows) => API.call({ action: 'importHocSinh', rows }),
+  importHocSinh: (rows) => API.call({ action: 'importHocSinh', rows: JSON.stringify(rows) }),
 
   // DIA DIEM
   getDiaDiem: (activeOnly=false) => API.call({ action: 'getDiaDiem', activeOnly: activeOnly ? 'true' : 'false' }),
