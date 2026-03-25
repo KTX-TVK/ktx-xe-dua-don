@@ -10,14 +10,11 @@
   :root {
     --primary: #1a5276;
     --primary-light: #2e86c1;
-    --accent: #f39c12;
     --bg: #f0f4f8;
     --white: #ffffff;
     --text: #2c3e50;
-    --text-light: #7f8c8d;
     --border: #dce3ea;
     --error: #e74c3c;
-    --success: #27ae60;
     --shadow: 0 4px 24px rgba(26,82,118,0.13);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,121 +22,48 @@
     font-family: 'Be Vietnam Pro', sans-serif;
     background: linear-gradient(135deg, #1a5276 0%, #2e86c1 60%, #85c1e9 100%);
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding: 20px;
   }
-  .login-wrap {
-    width: 100%;
-    max-width: 420px;
-  }
-  .logo-area {
-    text-align: center;
-    margin-bottom: 32px;
-  }
+  .login-wrap { width: 100%; max-width: 420px; }
+  .logo-area { text-align: center; margin-bottom: 32px; }
   .logo-icon {
-    width: 72px; height: 72px;
-    background: var(--white);
-    border-radius: 20px;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    font-size: 36px;
+    width: 72px; height: 72px; background: var(--white);
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); font-size: 36px;
   }
-  .logo-area h1 {
-    color: #fff;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-  }
-  .logo-area p {
-    color: rgba(255,255,255,0.8);
-    font-size: 13px;
-    margin-top: 4px;
-  }
-  .card {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 36px 32px;
-    box-shadow: var(--shadow);
-  }
-  .card h2 {
-    font-size: 20px;
-    color: var(--primary);
-    font-weight: 700;
-    margin-bottom: 24px;
-    text-align: center;
-  }
-  .form-group {
-    margin-bottom: 18px;
-  }
-  .form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 7px;
-  }
+  .logo-area h1 { color: #fff; font-size: 22px; font-weight: 700; }
+  .logo-area p { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 4px; }
+  .card { background: var(--white); border-radius: 20px; padding: 36px 32px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 20px; color: var(--primary); font-weight: 700; margin-bottom: 24px; text-align: center; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
   .form-group input {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--text);
-    transition: border-color 0.2s;
-    outline: none;
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 15px; font-family: inherit; color: var(--text);
+    transition: border-color 0.2s; outline: none;
   }
-  .form-group input:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 3px rgba(46,134,193,0.1);
-  }
+  .form-group input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(46,134,193,0.1); }
   .btn-login {
-    width: 100%;
-    padding: 13px;
+    width: 100%; padding: 13px;
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: opacity 0.2s, transform 0.1s;
-    letter-spacing: 0.3px;
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 700; font-family: inherit;
+    cursor: pointer; margin-top: 8px; transition: opacity 0.2s;
   }
   .btn-login:hover { opacity: 0.93; }
-  .btn-login:active { transform: scale(0.98); }
   .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
   .error-msg {
-    background: #fdecea;
-    color: var(--error);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    margin-top: 14px;
-    display: none;
-    text-align: center;
+    background: #fdecea; color: var(--error); border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; margin-top: 14px; display: none; text-align: center;
   }
   .error-msg.show { display: block; }
-  .footer-note {
-    text-align: center;
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
-    margin-top: 20px;
-  }
+  .footer-note { text-align: center; color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 20px; }
   .spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2px solid rgba(255,255,255,0.5);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.5); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 6px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -164,24 +88,18 @@
     <button class="btn-login" id="btnLogin" onclick="doLogin()">Đăng Nhập</button>
     <div class="error-msg" id="errMsg"></div>
   </div>
-  <div class="footer-note">© 2025 Hệ thống KTX • Phiên bản 1.0</div>
+  <div class="footer-note">© 2026 Hệ thống KTX • Phiên bản 1.0</div>
 </div>
 
 <script>
-const API_URL = localStorage.getItem('api_url') || '';
+// ✅ URL CỐ ĐỊNH - không cần nhập trên mỗi máy
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxrfAFzQ70t1oN4ifj8WQgvAbwnvUvPHTzEC32N-M7SGuF5WUmZa1RyVbgzl-mwn3UU/exec';
 
-// Kiểm tra đã đăng nhập chưa
 window.onload = function() {
   const user = sessionStorage.getItem('ktx_user');
-  if (user) window.location.href = 'app.html';
-
-  // Cho phép nhấn Enter
-  document.getElementById('password').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin();
-  });
-  document.getElementById('username').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin();
-  });
+  if (user) { window.location.href = 'app.html'; return; }
+  document.getElementById('password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+  document.getElementById('username').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 };
 
 async function doLogin() {
@@ -190,33 +108,26 @@ async function doLogin() {
   const btn = document.getElementById('btnLogin');
   const err = document.getElementById('errMsg');
 
-  if (!username || !password) {
-    showError('Vui lòng nhập tên đăng nhập và mật khẩu');
-    return;
-  }
-
-  const apiUrl = localStorage.getItem('api_url');
-  if (!apiUrl) {
-    // Nếu chưa có API URL, hỏi người dùng
-    const url = prompt('Nhập Google Apps Script URL (lần đầu tiên sử dụng):');
-    if (!url) return;
-    localStorage.setItem('api_url', url);
-  }
+  if (!username || !password) { showError('Vui lòng nhập tên đăng nhập và mật khẩu'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Đang đăng nhập...';
   err.classList.remove('show');
 
   try {
-    const res = await callAPI({ action: 'login', username, password });
-    if (res.success) {
-      sessionStorage.setItem('ktx_user', JSON.stringify(res.user));
+    const params = new URLSearchParams({ action: 'login', username, password });
+    const res = await fetch(GAS_URL + '?' + params.toString(), { method: 'GET', redirect: 'follow' });
+    const text = await res.text();
+    const data = JSON.parse(text);
+    if (data.success) {
+      sessionStorage.setItem('ktx_user', JSON.stringify(data.user));
       window.location.href = 'app.html';
     } else {
-      showError(res.error || 'Sai tên đăng nhập hoặc mật khẩu');
+      showError(data.error || 'Sai tên đăng nhập hoặc mật khẩu');
     }
   } catch(e) {
     showError('Không thể kết nối. Kiểm tra lại đường truyền.');
+    console.error(e);
   } finally {
     btn.disabled = false;
     btn.innerHTML = 'Đăng Nhập';
@@ -227,16 +138,6 @@ function showError(msg) {
   const err = document.getElementById('errMsg');
   err.textContent = msg;
   err.classList.add('show');
-}
-
-async function callAPI(data) {
-  const url = localStorage.getItem('api_url');
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(data)
-  });
-  return res.json();
 }
 </script>
 </body>
