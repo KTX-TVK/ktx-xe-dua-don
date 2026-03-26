@@ -388,6 +388,46 @@ input[type=checkbox].toggle { width: 18px; height: 18px; }
   </div>
 </div>
 
+
+<!-- TAB BÁO CÁO KHOẢNG -->
+<div class="tab-content" id="content-bao-cao-khoang">
+  <div class="card">
+    <div class="card-title">📅 Báo Cáo Theo Khoảng Thời Gian</div>
+    <p style="font-size:13px;color:var(--text-light);margin-bottom:14px">Tổng hợp tất cả đăng ký có ngày về <strong>hoặc</strong> ngày lên nằm trong khoảng thời gian chọn.</p>
+    <div class="form-row">
+      <div class="form-group"><label>📅 Từ ngày <span class="req">*</span></label><input type="date" id="bck-tu-ngay"></div>
+      <div class="form-group"><label>📅 Đến ngày <span class="req">*</span></label><input type="date" id="bck-den-ngay"></div>
+      <div class="form-group"><label>&nbsp;</label><button class="btn btn-primary" onclick="loadBaoCaoKhoang()">📊 Xem</button></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn btn-outline btn-sm" onclick="setKhoang(7)">7 ngày qua</button>
+      <button class="btn btn-outline btn-sm" onclick="setKhoang(14)">14 ngày qua</button>
+      <button class="btn btn-outline btn-sm" onclick="setKhoang(30)">30 ngày qua</button>
+      <button class="btn btn-outline btn-sm" onclick="setThisWeek()">Tuần này</button>
+      <button class="btn btn-outline btn-sm" onclick="setThisMonth()">Tháng này</button>
+    </div>
+  </div>
+  <div id="bckStats" style="display:none">
+    <div class="stat-grid" id="bckStatCards"></div>
+    <div class="card">
+      <div class="card-title">📈 Thống Kê Theo Ngày</div>
+      <div class="table-wrap"><table><thead><tr><th>Ngày</th><th style="text-align:center">🏠 Về</th><th style="text-align:center">⬆️ Lên</th><th style="text-align:center">Tổng</th></tr></thead><tbody id="bckTheoNgay"></tbody></table></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" class="bc-two-col">
+      <div class="card"><div class="card-title">🏠 Thống kê nơi VỀ</div><div class="table-wrap"><table><thead><tr><th>Nơi về</th><th>Số lượng</th></tr></thead><tbody id="bckThongKeVe"></tbody></table></div></div>
+      <div class="card"><div class="card-title">⬆️ Thống kê nơi LÊN</div><div class="table-wrap"><table><thead><tr><th>Nơi đón</th><th>Số lượng</th></tr></thead><tbody id="bckThongKeLen"></tbody></table></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Danh Sách Chi Tiết</div>
+      <div class="btn-group" style="margin-bottom:12px">
+        <button class="btn btn-success" onclick="exportExcelKhoang()">📊 Xuất Excel</button>
+        <button class="btn btn-danger" onclick="printReportKhoang()">🖨️ In / Xuất PDF</button>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Lớp</th><th>Lầu</th><th>Phòng</th><th>Ngày về</th><th>Nơi về</th><th>Ngày lên</th><th>Nơi đón</th><th>GV</th></tr></thead><tbody id="bckBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
 </div><!-- end main -->
 
 <!-- PRINT AREA - ẩn trên màn hình, hiện khi in -->
@@ -416,10 +456,10 @@ let editHSId = null;
 
 // Cấu hình tabs theo role
 const TAB_CONFIG = {
-  admin:     ['hoc-sinh','dia-diem','dang-ky','tong-hop','bao-cao','phan-quyen'],
-  truonglau: ['dang-ky','bao-cao'],
+  admin:     ['hoc-sinh','dia-diem','dang-ky','tong-hop','bao-cao','bao-cao-khoang','phan-quyen'],
+  truonglau: ['dang-ky','bao-cao','bao-cao-khoang'],
   giaovien:  ['dang-ky'],
-  nhaxe:     ['bao-cao']
+  nhaxe:     ['bao-cao','bao-cao-khoang']
 };
 
 const TAB_LABELS = {
@@ -428,6 +468,7 @@ const TAB_LABELS = {
   'dang-ky':    '📋 Đăng Ký',
   'tong-hop':   '🔒 Tổng Hợp',
   'bao-cao':    '📊 Báo Cáo',
+  'bao-cao-khoang': '📅 BC Khoảng',
   'phan-quyen': '👥 Phân Quyền'
 };
 
@@ -623,8 +664,8 @@ function renderDKTable(list) {
     <td><input type="checkbox" class="dk-check" data-id="${r.id}" ${r.trang_thai==='locked'?'disabled':''}></td>
     <td>${r.ngay_dk}</td><td>${r.ma_ktx||'-'}</td><td><strong>${r.ho_ten}</strong></td>
     <td>${r.lop}</td><td>${r.lau}</td><td>${r.phong}</td>
-    <td>${r.co_ve==='true'?r.ngay_ve:'-'}</td><td>${r.co_ve==='true'?r.noi_ve:'-'}</td>
-    <td>${r.co_len==='true'?r.ngay_len:'-'}</td><td>${r.co_len==='true'?r.noi_len:'-'}</td>
+    <td>${r.co_ve==='true'?fmtDate(r.ngay_ve):'—'}</td><td>${r.co_ve==='true'?r.noi_ve:'—'}</td>
+    <td>${r.co_len==='true'?fmtDate(r.ngay_len):'—'}</td><td>${r.co_len==='true'?r.noi_len:'—'}</td>
     <td>${r.gv_ten||'-'}</td>
     <td><span class="badge ${r.trang_thai==='locked'?'badge-locked':'badge-open'}">${r.trang_thai==='locked'?'🔒 Khóa':'✅ Mở'}</span></td>
     <td>${r.trang_thai!=='locked'?`<button class="btn btn-warning btn-sm" onclick="fillEditDK('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteDK('${r.id}')">🗑</button>`:'<span style="color:var(--text-light);font-size:11px">Đã khóa</span>'}</td>
@@ -779,8 +820,8 @@ async function showPreview(nv,nl) {
 function renderPreviewTable(list) {
   document.getElementById('thPreviewBody').innerHTML = list.map((r,i) => `<tr>
     <td>${i+1}</td><td>${r.ho_ten}</td><td>${r.lop}</td><td>${r.lau}</td><td>${r.phong}</td>
-    <td>${r.co_ve==='true'?r.ngay_ve:'-'}</td><td>${r.co_ve==='true'?r.noi_ve:'-'}</td>
-    <td>${r.co_len==='true'?r.ngay_len:'-'}</td><td>${r.co_len==='true'?r.noi_len:'-'}</td>
+    <td>${r.co_ve==='true'?fmtDate(r.ngay_ve):'—'}</td><td>${r.co_ve==='true'?r.noi_ve:'—'}</td>
+    <td>${r.co_len==='true'?fmtDate(r.ngay_len):'—'}</td><td>${r.co_len==='true'?r.noi_len:'—'}</td>
     <td>${r.gv_ten||'-'}</td>
   </tr>`).join('') || '<tr><td colspan="10">Không có dữ liệu</td></tr>';
 }
@@ -806,8 +847,8 @@ async function loadBaoCao() {
   document.getElementById('bcThongKeLen').innerHTML = Object.entries(tkLen).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${k}</td><td><strong>${v}</strong></td></tr>`).join('')||'<tr><td colspan="2">Không có dữ liệu</td></tr>';
   document.getElementById('bcBody').innerHTML = list.map((r,i)=>`<tr>
     <td>${i+1}</td><td>${r.ho_ten}</td><td>${r.lop}</td><td>${r.lau}</td><td>${r.phong}</td>
-    <td>${r.co_ve==='true'?r.ngay_ve:'-'}</td><td>${r.co_ve==='true'?r.noi_ve:'-'}</td>
-    <td>${r.co_len==='true'?r.ngay_len:'-'}</td><td>${r.co_len==='true'?r.noi_len:'-'}</td>
+    <td>${r.co_ve==='true'?fmtDate(r.ngay_ve):'—'}</td><td>${r.co_ve==='true'?r.noi_ve:'—'}</td>
+    <td>${r.co_len==='true'?fmtDate(r.ngay_len):'—'}</td><td>${r.co_len==='true'?r.noi_len:'—'}</td>
   </tr>`).join('')||'<tr><td colspan="9">Không có dữ liệu</td></tr>';
 }
 
@@ -956,9 +997,9 @@ function printReport(source) {
     <td class="text-center">${r.lop}</td>
     <td class="text-center">Lầu ${r.lau}</td>
     <td class="text-center">P.${r.phong}</td>
-    <td class="text-center">${r.co_ve==='true'?r.ngay_ve:'—'}</td>
+    <td class="text-center">${r.co_ve==='true'?fmtDate(r.ngay_ve):'—'</td>
     <td>${r.co_ve==='true'?r.noi_ve+(r.phuong_xa_ve?', '+r.phuong_xa_ve:''):'—'}</td>
-    <td class="text-center">${r.co_len==='true'?r.ngay_len:'—'}</td>
+    <td class="text-center">${r.co_len==='true'?fmtDate(r.ngay_len):'—'</td>
     <td>${r.co_len==='true'?r.noi_len+(r.phuong_xa_len?', '+r.phuong_xa_len:''):'—'}</td>
     <td>${r.gv_ten||'—'}</td>
   </tr>`).join('')}
@@ -1053,6 +1094,111 @@ function clearUserForm() {
   document.getElementById('usr-role').value='giaovien'; document.getElementById('usr-lau').value='';
   document.getElementById('lau-select-group').style.display='none';
 }
+
+function setKhoang(days){
+  var den=new Date(),tu=new Date();
+  tu.setDate(tu.getDate()-days+1);
+  document.getElementById('bck-tu-ngay').value=tu.toISOString().split('T')[0];
+  document.getElementById('bck-den-ngay').value=den.toISOString().split('T')[0];
+}
+function setThisWeek(){
+  var now=new Date(),day=now.getDay()||7;
+  var tu=new Date(now);tu.setDate(now.getDate()-day+1);
+  var den=new Date(tu);den.setDate(tu.getDate()+6);
+  document.getElementById('bck-tu-ngay').value=tu.toISOString().split('T')[0];
+  document.getElementById('bck-den-ngay').value=den.toISOString().split('T')[0];
+}
+function setThisMonth(){
+  var now=new Date();
+  var tu=new Date(now.getFullYear(),now.getMonth(),1);
+  var den=new Date(now.getFullYear(),now.getMonth()+1,0);
+  document.getElementById('bck-tu-ngay').value=tu.toISOString().split('T')[0];
+  document.getElementById('bck-den-ngay').value=den.toISOString().split('T')[0];
+}
+async function loadBaoCaoKhoang(){
+  var tuNgay=document.getElementById('bck-tu-ngay').value;
+  var denNgay=document.getElementById('bck-den-ngay').value;
+  if(!tuNgay||!denNgay){showToast('Chọn từ ngày và đến ngày','error');return;}
+  if(tuNgay>denNgay){showToast('Từ ngày phải trước đến ngày','error');return;}
+  showLoading('Đang tải báo cáo...');
+  var res=await API.getBaoCaoKhoang({tu_ngay:tuNgay,den_ngay:denNgay,role:currentUser.role});
+  hideLoading();
+  var list=res.data||[],tkVe=res.thong_ke_ve||{},tkLen=res.thong_ke_len||{},theoNgay=res.theo_ngay||{};
+  window._bckData=list; window._bckTuNgay=tuNgay; window._bckDenNgay=denNgay;
+  document.getElementById('bckStats').style.display='block';
+  var totalVe=list.filter(r=>r.co_ve==='true').length;
+  var totalLen=list.filter(r=>r.co_len==='true').length;
+  document.getElementById('bckStatCards').innerHTML=
+    '<div class="stat-card"><div class="stat-label">🏠 Tổng về</div><div class="stat-val">'+totalVe+'</div><div class="stat-sub">học sinh</div></div>'+
+    '<div class="stat-card"><div class="stat-label">⬆️ Tổng lên</div><div class="stat-val">'+totalLen+'</div><div class="stat-sub">học sinh</div></div>'+
+    '<div class="stat-card"><div class="stat-label">📋 Tổng cộng</div><div class="stat-val">'+list.length+'</div><div class="stat-sub">đăng ký</div></div>'+
+    '<div class="stat-card"><div class="stat-label">📅 Số ngày</div><div class="stat-val">'+Object.keys(theoNgay).length+'</div><div class="stat-sub">có đăng ký</div></div>';
+  var sortedDays=Object.keys(theoNgay).sort();
+  document.getElementById('bckTheoNgay').innerHTML=sortedDays.map(d=>
+    '<tr><td><strong>'+fmtDate(d)+'</strong></td>'+
+    '<td style="text-align:center">'+(theoNgay[d].ve?'<span style="color:#1e8c3e;font-weight:700">'+theoNgay[d].ve+'</span>':'—')+'</td>'+
+    '<td style="text-align:center">'+(theoNgay[d].len?'<span style="color:#2e86c1;font-weight:700">'+theoNgay[d].len+'</span>':'—')+'</td>'+
+    '<td style="text-align:center;font-weight:700">'+((theoNgay[d].ve||0)+(theoNgay[d].len||0))+'</td></tr>'
+  ).join('')||'<tr><td colspan="4" style="text-align:center">Không có dữ liệu</td></tr>';
+  document.getElementById('bckThongKeVe').innerHTML=Object.entries(tkVe).sort((a,b)=>b[1]-a[1]).map(e=>'<tr><td>'+e[0]+'</td><td><strong>'+e[1]+'</strong></td></tr>').join('')||'<tr><td colspan="2">Không có</td></tr>';
+  document.getElementById('bckThongKeLen').innerHTML=Object.entries(tkLen).sort((a,b)=>b[1]-a[1]).map(e=>'<tr><td>'+e[0]+'</td><td><strong>'+e[1]+'</strong></td></tr>').join('')||'<tr><td colspan="2">Không có</td></tr>';
+  document.getElementById('bckBody').innerHTML=list.map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td><td><strong>'+r.ho_ten+'</strong></td><td>'+r.lop+'</td><td>L.'+r.lau+'</td><td>P.'+r.phong+'</td>'+
+    '<td>'+(r.co_ve==='true'?fmtDate(r.ngay_ve):'—')+'</td><td>'+(r.co_ve==='true'?r.noi_ve:'—')+'</td>'+
+    '<td>'+(r.co_len==='true'?fmtDate(r.ngay_len):'—')+'</td><td>'+(r.co_len==='true'?r.noi_len:'—')+'</td>'+
+    '<td>'+(r.gv_ten||'—')+'</td></tr>';
+  }).join('')||'<tr><td colspan="10">Không có dữ liệu</td></tr>';
+}
+function exportExcelKhoang(){
+  var data=window._bckData;
+  if(!data||!data.length){showToast('Không có dữ liệu','error');return;}
+  var rows=[['STT','Họ tên','Lớp','Lầu','Phòng','Ngày về','Nơi về','Ngày lên','Nơi đón','GV']];
+  data.forEach(function(r,i){rows.push([i+1,r.ho_ten,r.lop,r.lau,r.phong,r.co_ve==='true'?fmtDate(r.ngay_ve):'',r.co_ve==='true'?r.noi_ve:'',r.co_len==='true'?fmtDate(r.ngay_len):'',r.co_len==='true'?r.noi_len:'',r.gv_ten||'']);});
+  var csv='\uFEFF'+rows.map(r=>r.join(',')).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='bao_cao_khoang_'+window._bckTuNgay+'_'+window._bckDenNgay+'.csv';a.click();
+  showToast('Đã xuất Excel!');
+}
+
+function printReportKhoang(){
+  var data=window._bckData;
+  if(!data||!data.length){showToast('Không có dữ liệu','error');return;}
+  var tuNgay=window._bckTuNgay,denNgay=window._bckDenNgay;
+  var totalVe=data.filter(r=>r.co_ve==='true').length;
+  var totalLen=data.filter(r=>r.co_len==='true').length;
+  var tkVe={},tkLen={},theoNgay={};
+  data.forEach(function(r){
+    if(r.co_ve==='true'&&r.noi_ve)tkVe[r.noi_ve]=(tkVe[r.noi_ve]||0)+1;
+    if(r.co_len==='true'&&r.noi_len)tkLen[r.noi_len]=(tkLen[r.noi_len]||0)+1;
+    if(r.co_ve==='true'&&r.ngay_ve){theoNgay[r.ngay_ve]=theoNgay[r.ngay_ve]||{ve:0,len:0};theoNgay[r.ngay_ve].ve++;}
+    if(r.co_len==='true'&&r.ngay_len){theoNgay[r.ngay_len]=theoNgay[r.ngay_len]||{ve:0,len:0};theoNgay[r.ngay_len].len++;}
+  });
+  var sortedDays=Object.keys(theoNgay).sort();
+  var LOGO='data:image/png;base64,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';
+  var rows=data.map(function(r,i){
+    return '<tr><td class="tc">'+(i+1)+'</td><td><strong>'+r.ho_ten+'</strong></td><td class="tc">'+r.lop+'</td><td class="tc">L.'+r.lau+'</td><td class="tc">P.'+r.phong+'</td>'+
+    '<td class="tc">'+(r.co_ve==='true'?fmtDate(r.ngay_ve):'—')+'</td><td>'+(r.co_ve==='true'?r.noi_ve+(r.phuong_xa_ve?', '+r.phuong_xa_ve:''):'—')+'</td>'+
+    '<td class="tc">'+(r.co_len==='true'?fmtDate(r.ngay_len):'—')+'</td><td>'+(r.co_len==='true'?r.noi_len+(r.phuong_xa_len?', '+r.phuong_xa_len:''):'—')+'</td>'+
+    '<td>'+(r.gv_ten||'—')+'</td></tr>';
+  }).join('');
+  var theoNgayRows=sortedDays.map(d=>'<tr><td><strong>'+fmtDate(d)+'</strong></td><td class="tc">'+(theoNgay[d].ve||'—')+'</td><td class="tc">'+(theoNgay[d].len||'—')+'</td><td class="tc"><strong>'+((theoNgay[d].ve||0)+(theoNgay[d].len||0))+'</strong></td></tr>').join('');
+  var veRows=Object.entries(tkVe).sort((a,b)=>b[1]-a[1]).map(e=>'<tr><td>'+e[0]+'</td><td class="tc"><strong>'+e[1]+'</strong></td></tr>').join('')||'<tr><td colspan="2" class="tc">Không có</td></tr>';
+  var lenRows=Object.entries(tkLen).sort((a,b)=>b[1]-a[1]).map(e=>'<tr><td>'+e[0]+'</td><td class="tc"><strong>'+e[1]+'</strong></td></tr>').join('')||'<tr><td colspan="2" class="tc">Không có</td></tr>';
+  var dateStr=new Date().toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Báo Cáo Khoảng</title><style>@page{size:A4 landscape;margin:10mm 12mm}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Times New Roman,serif;font-size:10.5pt;color:#000;background:#fff}.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;border-bottom:3px solid #146b2e;padding-bottom:8px}.logo{width:55px;height:42px;object-fit:contain}.rhl{display:flex;align-items:center;gap:12px}.sn{font-size:13pt;font-weight:bold;color:#146b2e;text-transform:uppercase}.ss{font-size:9pt;color:#555;margin-top:2px}.rhr{text-align:right;font-size:9pt;color:#555}.rhr strong{display:block;font-size:10pt;color:#000}.rt{text-align:center;margin:8px 0 4px}.rt h2{font-size:15pt;font-weight:bold;text-transform:uppercase;color:#146b2e;letter-spacing:1px}.rt .sub{font-size:10pt;color:#333;margin-top:3px}.period{text-align:center;font-size:11pt;font-weight:bold;color:#146b2e;margin:4px 0 10px;padding:6px;background:#f0faf2;border-radius:6px;border:1px solid #a8d8b0}.sr{display:flex;gap:8px;margin-bottom:10px}.sb{flex:1;border:1.5px solid #146b2e;border-radius:6px;padding:5px 8px;text-align:center}.sb .v{font-size:17pt;font-weight:bold;color:#146b2e}.sb .l{font-size:8pt;color:#555}.tc{display:flex;gap:12px;margin-bottom:10px}.tc2{flex:1}.tc2 h4{background:#1e8c3e;color:#fff;padding:4px 8px;font-size:10pt;border-radius:4px 4px 0 0}table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:10px}th{background:#146b2e;color:#fff;padding:5px 6px;text-align:center;font-weight:bold}td{padding:4px 6px;border:1px solid #ccc;vertical-align:middle}tr:nth-child(even) td{background:#f4faf5}.tcc{text-align:center}.footer{display:flex;justify-content:space-between;margin-top:12px;font-size:9.5pt}.sign{text-align:center;width:190px}.sign-title{font-weight:bold;margin-bottom:45px}.sign-name{font-style:italic;color:#555}.pnote{font-size:8pt;color:#999;text-align:center;margin-top:6px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>');
+  w.document.write('<div class="rh"><div class="rhl"><img src="'+LOGO+'" class="logo" alt="Logo"><div><div class="sn">Trường TH, THCS và THPT Trương Vĩnh Ký</div><div class="ss">Ký Túc Xá — Hệ thống đăng ký xe đưa đón</div></div></div><div class="rhr"><strong>TỔNG HỢP ĐĂNG KÝ XE ĐƯA ĐÓN</strong>Ngày in: '+dateStr+'</div></div>');
+  w.document.write('<div class="rt"><h2>Tổng Hợp Đăng Ký Xe Đưa Đón</h2><div class="sub">Ký Túc Xá — Trường TH, THCS và THPT Trương Vĩnh Ký</div></div>');
+  w.document.write('<div class="period">📅 Kỳ báo cáo: '+fmtDate(tuNgay)+' — '+fmtDate(denNgay)+'</div>');
+  w.document.write('<div class="sr"><div class="sb"><div class="v">'+totalVe+'</div><div class="l">🏠 Học sinh về</div></div><div class="sb"><div class="v">'+totalLen+'</div><div class="l">⬆️ Học sinh lên</div></div><div class="sb"><div class="v">'+data.length+'</div><div class="l">📋 Tổng đăng ký</div></div><div class="sb"><div class="v">'+sortedDays.length+'</div><div class="l">📅 Số ngày</div></div><div class="sb"><div class="v">'+(Object.keys(tkVe).length+Object.keys(tkLen).length)+'</div><div class="l">📍 Tuyến xe</div></div></div>');
+  w.document.write('<div class="tc"><div class="tc2" style="flex:0.7"><h4>📈 Theo Ngày</h4><table><thead><tr><th>Ngày</th><th>🏠 Về</th><th>⬆️ Lên</th><th>Tổng</th></tr></thead><tbody>'+theoNgayRows+'</tbody></table></div><div class="tc2"><h4>🏠 Nơi Về</h4><table><thead><tr><th>Tỉnh/TP</th><th style="width:60px">SL</th></tr></thead><tbody>'+veRows+'</tbody></table><div style="margin-top:6px"><h4 style="background:#2e86c1">⬆️ Nơi Lên</h4><table><thead><tr><th>Tỉnh/TP</th><th style="width:60px">SL</th></tr></thead><tbody>'+lenRows+'</tbody></table></div></div></div>');
+  w.document.write('<table><thead><tr><th style="width:28px">STT</th><th>Họ và tên</th><th style="width:48px">Lớp</th><th style="width:38px">Lầu</th><th style="width:48px">Phòng</th><th style="width:78px">Ngày về</th><th>Nơi về</th><th style="width:78px">Ngày lên</th><th>Nơi đón</th><th>Giáo viên</th></tr></thead><tbody>'+rows+'</tbody></table>');
+  w.document.write('<div class="footer"><div class="sign"><div class="sign-title">Giáo vụ KTX</div><div class="sign-name">(Ký và ghi rõ họ tên)</div></div><div class="sign"><div class="sign-title">Nhà xe xác nhận</div><div class="sign-name">(Ký và ghi rõ họ tên)</div></div><div class="sign"><div class="sign-title">Hiệu trưởng / BGH</div><div class="sign-name">(Ký và ghi rõ họ tên)</div></div></div>');
+  w.document.write('<div class="pnote">In từ hệ thống đăng ký xe đưa đón KTX — Trường TH, THCS và THPT Trương Vĩnh Ký</div></body></html>');
+  w.document.close();
+  setTimeout(function(){w.print();},800);
+}
+
 const bcStyle=document.createElement('style');
 bcStyle.textContent='@media(max-width:700px){.bc-two-col{grid-template-columns:1fr!important;}}';
 document.head.appendChild(bcStyle);
