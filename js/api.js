@@ -119,3 +119,16 @@ function showToast(msg, type='success') {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => { t.style.display = 'none'; }, 3500);
 }
+
+// Báo cáo khoảng thời gian
+API.getBaoCaoKhoang = (params) => API.call({ action: 'getBaoCaoKhoang', ...params });
+
+// Format yyyy-mm-dd → dd/mm/yyyy để hiển thị
+function fmtDate(d) {
+  if (!d || d === '-' || d === '') return '—';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const p = d.split('-');
+    return p[2]+'/'+p[1]+'/'+p[0];
+  }
+  return d;
+}
