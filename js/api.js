@@ -1,7 +1,7 @@
 // api.js - Giao tiếp với Google Apps Script
 
 // ✅ URL CỐ ĐỊNH - mọi máy đều dùng chung, không cần nhập lại
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzfnbYrqY5mRfoq75jHe9abUMNGKh27id1ruLMIXGZFI_U6h_nL20HuJqZUcRXOAMLJ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcI-ydRaEQ1wa2C_Ev4G3cTe1NT_hY7UxzTsIsO68n3zEcqPVwsBJnorDqFn2hKElG/exec';
 
 const API = {
   async call(data) {
