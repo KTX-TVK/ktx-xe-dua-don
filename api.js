@@ -1,15 +1,12 @@
 // api.js - Giao tiếp với Google Apps Script
-// Dùng GET request để tránh CORS preflight
+
+// ✅ URL CỐ ĐỊNH - mọi máy đều dùng chung, không cần nhập lại
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzfnbYrqY5mRfoq75jHe9abUMNGKh27id1ruLMIXGZFI_U6h_nL20HuJqZUcRXOAMLJ/exec';
 
 const API = {
   async call(data) {
-    const url = localStorage.getItem('api_url');
-    if (!url) {
-      window.location.href = 'index.html';
-      return;
-    }
+    const url = GAS_URL;
     try {
-      // Dùng GET + query string để tránh CORS
       const params = new URLSearchParams();
       for (const key in data) {
         if (data[key] !== undefined && data[key] !== null) {
@@ -27,7 +24,7 @@ const API = {
         return JSON.parse(text);
       } catch(e) {
         console.error('Parse error:', text.substring(0, 200));
-        return { error: 'Lỗi phản hồi server' };
+        return { error: 'Lỗi phản hồi server: ' + text.substring(0,100) };
       }
     } catch (e) {
       console.error('API Error:', e);
@@ -72,33 +69,43 @@ const API = {
   getBaoCao: (params) => API.call({ action: 'getBaoCao', ...params }),
 };
 
-// Helper: lấy user hiện tại
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+
 function getCurrentUser() {
   const u = sessionStorage.getItem('ktx_user');
   return u ? JSON.parse(u) : null;
 }
 
-// Helper: kiểm tra quyền
 function hasRole(...roles) {
   const u = getCurrentUser();
   return u && roles.includes(u.role);
 }
 
-// Helper: format ngày dd/mm/yyyy
-function formatDate(dateStr) {
-  if (!dateStr) return '';
+// Hiển thị ngày đẹp: 2026-03-28 → 28/03/2026
+function formatDateDisplay(dateStr) {
+  if (!dateStr) return '-';
   if (dateStr.includes('/')) return dateStr;
-  const d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  // yyyy-mm-dd → dd/mm/yyyy
+  const parts = dateStr.split('-');
+  if (parts.length === 3) return parts[2]+'/'+parts[1]+'/'+parts[0];
+  return dateStr;
 }
 
+// Ngày hôm nay dạng dd/mm/yyyy (dùng cho label hiển thị)
 function todayStr() {
   const d = new Date();
-  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
 }
 
-// Hiển thị toast
+// Ngày hôm nay dạng yyyy-mm-dd (dùng cho input[type=date])
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+// Hiển thị toast thông báo
 function showToast(msg, type='success') {
   let t = document.getElementById('toast');
   if (!t) {
@@ -109,10 +116,19 @@ function showToast(msg, type='success') {
   t.className = 'toast ' + type;
   t.textContent = msg;
   t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3000);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, 3500);
 }
 
-// Confirm dialog
-function confirmAction(msg) {
-  return confirm(msg);
+// Báo cáo khoảng thời gian
+API.getBaoCaoKhoang = (params) => API.call({ action: 'getBaoCaoKhoang', ...params });
+
+// Format yyyy-mm-dd → dd/mm/yyyy để hiển thị
+function fmtDate(d) {
+  if (!d || d === '-' || d === '') return '—';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const p = d.split('-');
+    return p[2]+'/'+p[1]+'/'+p[0];
+  }
+  return d;
 }
